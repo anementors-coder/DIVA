@@ -1,0 +1,112 @@
+Folder PATH listing
+Volume serial number is CA69-10D6
+C:.
+|   .env
+|   .gitignore
+|   directory_structure.txt
+|   docker-compose.yml
+|   oauth-public.key
+|   README.md
+|   
+\---backend
+    |   Dockerfile
+    |   
+    \---app
+        |   alembic.ini
+        |   poetry
+        |   poetry.lock
+        |   pyproject.toml
+        |   README.md
+        |   
+        +---alembic
+        |   |   env.py
+        |   |   README
+        |   |   script.py.mako
+        |   |   
+        |   \---versions
+        |           4e17e47ab352_create_initial_tables.py
+        |           
+        +---app
+        |   |   initial_data.py
+        |   |   main.py
+        |   |   __init__.py
+        |   |   
+        |   +---api
+        |   |   |   deps.py
+        |   |   |   __init__.py
+        |   |   |   
+        |   |   +---v1
+        |   |   |   |   api.py
+        |   |   |   |   __init__.py
+        |   |   |   |   
+        |   |   |   +---endpoints
+        |   |   |   |   |   onboarding.py
+        |   |   |   |   |   __init__.py
+        |   |   |   |   |   
+        |   |   |   |   \---__pycache__
+        |   |   |   |           onboarding.cpython-313.pyc
+        |   |   |   |           __init__.cpython-313.pyc
+        |   |   |   |           
+        |   |   |   \---__pycache__
+        |   |   |           api.cpython-313.pyc
+        |   |   |           __init__.cpython-313.pyc
+        |   |   |           
+        |   |   \---__pycache__
+        |   |           __init__.cpython-313.pyc
+        |   |           
+        |   +---core
+        |   |   |   config.py
+        |   |   |   security.py
+        |   |   |   __init__.py
+        |   |   |   
+        |   |   \---__pycache__
+        |   |           config.cpython-313.pyc
+        |   |           __init__.cpython-313.pyc
+        |   |           
+        |   +---crud
+        |   |       base_crud.py
+        |   |       __init__.py
+        |   |       
+        |   +---db
+        |   |   |   base.py
+        |   |   |   base_class.py
+        |   |   |   init_db.py
+        |   |   |   session.py
+        |   |   |   __init__.py
+        |   |   |   
+        |   |   \---__pycache__
+        |   |           base.cpython-313.pyc
+        |   |           base_class.cpython-313.pyc
+        |   |           __init__.cpython-313.pyc
+        |   |           
+        |   +---deps
+        |   +---models
+        |   |   |   onboarding.py
+        |   |   |   user.py
+        |   |   |   __init__.py
+        |   |   |   
+        |   |   \---__pycache__
+        |   |           onboarding.cpython-313.pyc
+        |   |           user.cpython-313.pyc
+        |   |           __init__.cpython-313.pyc
+        |   |           
+        |   +---schemas
+        |   |       __init__.py
+        |   |       
+        |   +---utils
+        |   |   |   __init__.py
+        |   |   |   
+        |   |   \---exceptions
+        |   |           __init__.py
+        |   |           
+        |   \---__pycache__
+        |           main.cpython-313.pyc
+        |           __init__.cpython-313.pyc
+        |           
+        \---test
+            |   test_main.py
+            |   __init__.py
+            |   
+            \---api
+                    __init__.py
+                    
