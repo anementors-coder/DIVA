@@ -1,1 +1,25 @@
- 
+ # Python cache
+__pycache__/
+*.pyc
+*.pyo
+# Environment files
+.env
+*.key
+
+oauth-public.key
+secrets-to-remove.txt
+directory_structure.txt
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# IDE settings
+.vscode/
+.idea/
+
+# Local poetry environment (if not needed)
+poetry/

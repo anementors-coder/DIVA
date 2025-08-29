@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "fastapi-ai-mentor"
+version = "0.1.0"
+description = "A FastAPI backend for the AI Mentor application."
+authors = ["Your Name <youremail@example.com>"]
+readme = "README.md"
+packages = [{include = "app"}] # <-- ADD THIS LINE
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+sqlalchemy = "^2.0.30"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.13.1"
+pydantic = {extras = ["email"], version = "^2.7.1"}
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.2.1"
+gunicorn = "^22.0.0"
+pyjwt = "^2.10.1"
+cryptography = "43.0.1"
+redis = "^6.4.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+requests = "^2.31.0"
+black = "^24.4.2"
+mypy = "^1.10.0"
+alembic = "^1.16.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
