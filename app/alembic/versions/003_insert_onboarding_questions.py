@@ -1,7 +1,7 @@
 """insert onboarding questions
 
-Revision ID: 001_insert_onboarding_questions
-Revises: 6258af572075
+Revision ID: 003_insert_onboarding_questions
+Revises: 002_insert_onboarding_questions
 Create Date: 2025-09-01 04:45:00
 """
 
@@ -10,8 +10,8 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision: str = "002_insert_onboarding_questions"
-down_revision: Union[str, None] = "6258af572075"
+revision: str = "003_insert_onboarding_questions"
+down_revision: Union[str, None] = "002_insert_onboarding_questions"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

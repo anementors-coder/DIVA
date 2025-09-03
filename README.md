@@ -1,69 +1,98 @@
 command to remove __pychache__ :  `Get-ChildItem -Recurse -Directory -Filter "__pycache__" | Remove-Item -Recurse -Force`
 command to save dir structure : `tree /F /A > directory_structure.txt`
-run command from root dir to generate migrations: `poetry run alembic -c app/alembic.ini upgrade head`
+run command from root dir to generate migrations: `poetry run alembic -c app/alembic.ini revision --autogenerate -m "create onboarding tables"`
 run command from root dir to run migrations: `poetry run alembic -c app/alembic.ini upgrade head`
-command to start fastapi server from root dir : `poetry run uvicorn app.main:app`
+command to start fastapi server from root dir : `poetry run uvicorn app.main:app  --host 0.0.0.0 --port 8080`
 
 ```
-code.ayesha
-├─ .env
-├─ backend
-│  ├─ app
-│  │  ├─ alembic
-│  │  │  ├─ env.py
-│  │  │  ├─ script.py.mako
-│  │  │  └─ versions
-│  │  ├─ alembic.ini
-│  │  ├─ app
-│  │  │  ├─ api
-│  │  │  │  ├─ deps.py
-│  │  │  │  ├─ v1
-│  │  │  │  │  ├─ api.py
-│  │  │  │  │  ├─ endpoints
-│  │  │  │  │  │  └─ __init__.py
-│  │  │  │  │  └─ __init__.py
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ core
-│  │  │  │  ├─ config.py
-│  │  │  │  ├─ security.py
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ crud
-│  │  │  │  ├─ base_crud.py
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ db
-│  │  │  │  ├─ base.py
-│  │  │  │  ├─ base_class.py
-│  │  │  │  ├─ init_db.py
-│  │  │  │  ├─ session.py
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ deps
-│  │  │  ├─ initial_data.py
-│  │  │  ├─ main.py
-│  │  │  ├─ models
-│  │  │  │  ├─ onboarding.py
-│  │  │  │  ├─ user.py
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ schemas
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ utils
-│  │  │  │  ├─ exceptions
-│  │  │  │  │  └─ __init__.py
-│  │  │  │  └─ __init__.py
-│  │  │  ├─ __init__.py
-│  │  │  └─ __pycache__
-│  │  │     ├─ main.cpython-313.pyc
-│  │  │     └─ __init__.cpython-313.pyc
-│  │  ├─ poetry.lock
-│  │  ├─ pyproject.toml
-│  │  ├─ README.md
-│  │  └─ test
-│  │     ├─ api
-│  │     │  └─ __init__.py
-│  │     ├─ test_main.py
-│  │     └─ __init__.py
-│  └─ Dockerfile
-├─ docker-compose.yml
-└─ README.md
+Folder PATH listing
+Volume serial number is CA69-10D6
+C:.
+|   .env
+|   .gitignore
+|   directory_structure.txt
+|   oauth-public.key
+|   poetry
+|   poetry.lock
+|   pyproject.toml
+|   README.md
+|   requirements.txt
+|   secrets-to-remove.txt
+|   
++---ai
+|   |   __init__.py
+|   |   
+|   +---agents
+|   |       resume_parser.py
+|   |       __init__.py
+|   |       
+|   \---llms
+|           config.py
+|           
++---app
+|   |   alembic.ini
+|   |   all_files.txt
+|   |   main.py
+|   |   __init__.py
+|   |   
+|   +---alembic
+|   |   |   env.py
+|   |   |   script.py.mako
+|   |   |   
+|   |   \---versions
+|   |           002_insert_onboarding_questions.py
+|   |           003_insert_onboarding_questions.py
+|   |           6258af572075_create_onboarding_tables.py
+|   |           
+|   +---api
+|   |   |   api.py
+|   |   |   __init__.py
+|   |   |   
+|   |   \---endpoints
+|   |           auth.py
+|   |           onboard_questions.py
+|   |           resume.py
+|   |           user_info.py
+|   |           __init__.py
+|   |           
+|   +---core
+|   |       config.py
+|   |       errors.py
+|   |       exception_handlers.py
+|   |       redis.py
+|   |       security.py
+|   |       __init__.py
+|   |       
+|   +---crud
+|   |       onboard_questions.py
+|   |       resume.py
+|   |       user_info.py
+|   |       __init__.py
+|   |       
+|   +---db
+|   |       base.py
+|   |       session.py
+|   |       __init__.py
+|   |       
+|   +---models
+|   |       onboarding.py
+|   |       __init__.py
+|   |       
+|   +---schemas
+|   |       general_response.py
+|   |       onboard_questions.py
+|   |       user_info.py
+|   |       __init__.py
+|   |       
+|   \---utils
+|           api_utils.py
+|           exceptions.py
+|           redis_utils.py
+|           s3_utils.py
+|           
+\---logs
+        endpoints.log
+        
 
 ```
 

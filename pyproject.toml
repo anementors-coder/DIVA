@@ -20,6 +20,10 @@ gunicorn = "^22.0.0"
 pyjwt = "^2.10.1"
 cryptography = "43.0.1"
 redis = "^6.4.0"
+boto3 = "^1.40.21"
+botocore = "^1.40.21"
+python-multipart = "^0.0.20"
+google-generativeai = "^0.8.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"

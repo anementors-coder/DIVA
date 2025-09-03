@@ -57,3 +57,4 @@ def get_user_data_from_redis(user_id: str) -> dict | None:
     This data persists longer than the JWT token itself.
     """
     return redis_user_manager.get_user_data(user_id)
+

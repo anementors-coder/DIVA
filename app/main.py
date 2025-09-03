@@ -4,7 +4,18 @@ from app.core.redis import redis_client
 
 app = FastAPI(title="AI Mentor API")
 
+from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI(title="AI Mentor API")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Configure this properly for production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 @app.on_event("startup")
 async def startup_event():
     try:
@@ -23,4 +34,4 @@ def read_root():
 
 
 # Include all versioned APIs
-app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_router, prefix="/api/eva")
