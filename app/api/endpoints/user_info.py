@@ -1,6 +1,5 @@
 import logging
 from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -15,21 +14,14 @@ from app.schemas.user_info import (
 )
 from app.schemas.general_response import ErrorResponse
 from app.core.security import verify_passport_jwt
-from app.core.errors import OnboardingException
+from app.core.errors import OnboardingException, ErrorCode
 from app.utils.api_utils import (
     get_db,
     handle_onboarding_exception,
     validate_onboarding_query_structure,
 )
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-    handlers=[
-        logging.FileHandler("logs/endpoints.log"),
-        logging.StreamHandler(),
-    ],
-)
+
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
@@ -87,14 +79,16 @@ def create_user_info(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Unexpected error creating user info for user {user_id}: {str(e)}"
+        logger.exception(f"Unexpected error creating user info for user {user_id}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not create user info.",
+            details={"error": str(e)},
         )
-        raise HTTPException(status_code=500, detail="Could not create user info.")
 
 
 @router.get(
-    "/user-info/me",
+    "/me",
     response_model=UserInfoRead,
     status_code=status.HTTP_200_OK,
     responses={
@@ -126,14 +120,67 @@ def get_my_user_info(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Unexpected error retrieving user info for user {user_id}: {str(e)}"
+        logger.exception(f"Unexpected error retrieving user info for user {user_id}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not retrieve user info.",
+            details={"error": str(e)},
         )
-        raise HTTPException(status_code=500, detail="Could not retrieve user info.")
+
+
+# Canonical "list all" route at the collection root
+@router.get(
+    "/",
+    response_model=List[UserInfoRead],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": List[UserInfoRead], "description": "All user info records retrieved successfully"},
+        401: {"model": ErrorResponse, "description": "Unauthorized - Invalid or missing authentication"},
+        403: {"model": ErrorResponse, "description": "Forbidden - Insufficient permissions"},
+        500: {"model": ErrorResponse, "description": "Internal server error"},
+    },
+)
+def get_all_user_info(
+    db: Session = Depends(get_db), claims: dict = Depends(verify_passport_jwt)
+):
+    """Get all user info records. (Admin/protected)"""
+    try:
+        logger.info(f"Retrieving all user info by admin {claims.get('sub')}")
+        user_infos = user_info_crud.get_all_user_info(db)
+        logger.info(f"Successfully retrieved {len(user_infos)} user info records")
+        return user_infos
+    except OnboardingException as e:
+        handle_onboarding_exception(e)
+    except Exception as e:
+        logger.exception("Unexpected error retrieving all user info")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not retrieve user info.",
+            details={"error": str(e)},
+        )
+
+
+# Backward-compatible alias for "/all" (defined BEFORE "/{usid}" to avoid collisions)
+@router.get(
+    "/all",
+    response_model=List[UserInfoRead],
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"model": List[UserInfoRead], "description": "All user info records retrieved successfully"},
+        401: {"model": ErrorResponse, "description": "Unauthorized - Invalid or missing authentication"},
+        403: {"model": ErrorResponse, "description": "Forbidden - Insufficient permissions"},
+        500: {"model": ErrorResponse, "description": "Internal server error"},
+    },
+)
+def get_all_user_info_alias(
+    db: Session = Depends(get_db), claims: dict = Depends(verify_passport_jwt)
+):
+    """Alias to list all user info records. (Admin/protected)"""
+    return get_all_user_info(db=db, claims=claims)
 
 
 @router.get(
-    "/user-info/{usid}",
+    "/{usid}",
     response_model=UserInfoRead,
     status_code=status.HTTP_200_OK,
     responses={
@@ -168,44 +215,16 @@ def get_user_info_by_usid(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Unexpected error retrieving user info for usid {usid}: {str(e)}"
+        logger.exception(f"Unexpected error retrieving user info for usid {usid}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not retrieve user info.",
+            details={"error": str(e)},
         )
-        raise HTTPException(status_code=500, detail="Could not retrieve user info.")
-
-
-@router.get(
-    "/user-info",
-    response_model=List[UserInfoRead],
-    status_code=status.HTTP_200_OK,
-    responses={
-        200: {"model": List[UserInfoRead], "description": "All user info records retrieved successfully"},
-        401: {"model": ErrorResponse, "description": "Unauthorized - Invalid or missing authentication"},
-        403: {"model": ErrorResponse, "description": "Forbidden - Insufficient permissions"},
-        500: {"model": ErrorResponse, "description": "Internal server error"}
-    },
-)
-def get_all_user_info(
-    db: Session = Depends(get_db), claims: dict = Depends(verify_passport_jwt)
-):
-    """Get all user info records. (Admin/protected)"""
-    try:
-        logger.info(f"Retrieving all user info by admin {claims.get('sub')}")
-        user_infos = user_info_crud.get_all_user_info(db)
-        logger.info(f"Successfully retrieved {len(user_infos)} user info records")
-        return user_infos
-    except OnboardingException as e:
-        logger.error(
-            f"OnboardingException retrieving all user info: {e.error_code} - {e.message}"
-        )
-        handle_onboarding_exception(e)
-    except Exception as e:
-        logger.error(f"Unexpected error retrieving all user info: {str(e)}")
-        raise HTTPException(status_code=500, detail="Could not retrieve user info.")
 
 
 @router.put(
-    "/user-info/me",
+    "/me",
     response_model=UserInfoRead,
     status_code=status.HTTP_200_OK,
     responses={
@@ -259,14 +278,16 @@ def update_my_user_info(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Unexpected error updating user info for user {user_id}: {str(e)}"
+        logger.exception(f"Unexpected error updating user info for user {user_id}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not update user info.",
+            details={"error": str(e)},
         )
-        raise HTTPException(status_code=500, detail="Could not update user info.")
 
 
 @router.patch(
-    "/user-info/me/resume-url",
+    "/me/resume-url",
     response_model=UserInfoRead,
     status_code=status.HTTP_200_OK,
     responses={
@@ -285,7 +306,7 @@ def update_my_resume_url(
     claims: dict = Depends(verify_passport_jwt),
 ):
     """
-    Update only the resume URL for the authenticated user. 
+    Update only the resume URL for the authenticated user.
     Note: This is for manually setting a URL, not for uploading a file.
     """
     try:
@@ -306,14 +327,16 @@ def update_my_resume_url(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Unexpected error updating resume URL for user {user_id}: {str(e)}"
+        logger.exception(f"Unexpected error updating resume URL for user {user_id}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not update resume URL.",
+            details={"error": str(e)},
         )
-        raise HTTPException(status_code=500, detail="Could not update resume URL.")
 
 
 @router.patch(
-    "/user-info/me/linkedin-url",
+    "/me/linkedin-url",
     response_model=UserInfoRead,
     status_code=status.HTTP_200_OK,
     responses={
@@ -352,14 +375,16 @@ def update_my_linkedin_url(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(
-            f"Unexpected error updating LinkedIn URL for user {user_id}: {str(e)}"
+        logger.exception(f"Unexpected error updating LinkedIn URL for user {user_id}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not update LinkedIn URL.",
+            details={"error": str(e)},
         )
-        raise HTTPException(status_code=500, detail="Could not update LinkedIn URL.")
 
 
 @router.delete(
-    "/user-info/{usid}",
+    "/{usid}",
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "User info deleted successfully"},
@@ -383,7 +408,7 @@ def delete_user_info_by_usid(
             logger.warning(f"User info not found for deletion: usid {usid}")
             raise HTTPException(status_code=404, detail="User info not found")
         logger.info(f"Successfully deleted user info for usid {usid}")
-        return None # Corresponds to status 204 No Content, but FastAPI handles 200 with no body
+        return None  # 200 with no body
     except OnboardingException as e:
         logger.error(
             f"OnboardingException deleting user info for usid {usid}: {e.error_code} - {e.message}"
@@ -392,5 +417,9 @@ def delete_user_info_by_usid(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Unexpected error deleting user info for usid {usid}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Could not delete user info.")
+        logger.exception(f"Unexpected error deleting user info for usid {usid}")
+        raise OnboardingException(
+            ErrorCode.INTERNAL_SERVER_ERROR,
+            custom_message="Could not delete user info.",
+            details={"error": str(e)},
+        )
